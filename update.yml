@@ -1,0 +1,13 @@
+- hosts: APP_MASTER
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  tasks:
+    - name: wf stop
+      service: name={{name_servise_wf_claster_mansger}} state=stopped
+
+- hosts: APP
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  tasks:
+    - name: wf stop
+      service: name={{name_servise_wf_claster_mansger}} state=stopped
