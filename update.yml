@@ -1,13 +1,54 @@
-- hosts: APP_MASTER
+- name: Wildfly master stop
+  hosts: APP_MASTER
   user: root
   vars_files: ~/ansible/common/vars/global.yml
   tasks:
     - name: wf stop
       service: name={{name_servise_wf_claster_mansger}} state=stopped
 
-- hosts: APP
+- name: Wildfly slave stop
+  hosts: APP
   user: root
   vars_files: ~/ansible/common/vars/global.yml
   tasks:
     - name: wf stop
-      service: name={{name_servise_wf_claster_mansger}} state=stopped
+      service: name={{name_servise_wf}} state=stopped
+
+- name: ma stop
+  hosts: MA
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  tasks:
+    - name: ma stop
+      service: name={{name_servise_wf_ma}} state=stopped
+
+- name: mar stop
+  hosts: MAR
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  tasks:
+    - name: mar stop
+      service: name={{name_servise_mar}} state=stopped
+
+- name: start pg_dump cm6
+  hosts: PG_CM5
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+
+  tasks:
+    - name: PG_DUMP_CM5
+      become: yes
+      become_user: postgres
+      command: "pg_dump --port 5432 --username 'postgres' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs=48 --file '{{CM5_PG_DIR}}/CM5-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}' 'cm5'"
+
+- hosts: PG_CMJ
+  user: root
+  vars:
+    CMJ_PG_DIR: /opt/cm-sochi/backup
+
+  tasks:
+    - name: PG_DUMP_CMJ
+      become: yes
+      become_user: postgres
+      command: "pg_dump --port 5432 --username 'postgres' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs=48 --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}' 'cmj'"
+
