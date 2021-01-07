@@ -1,9 +1,19 @@
 ---
-#имс службы на састера wf
+#имя службы на мастере wf
 name_servise_wf_claster_mansger: wildfly
 #имя службы на пользовательских WF
 name_servise_wf: wildfly
-#имя службв wildfly для менджера агентов
+#имя службы wildfly для менджера агентов
 name_servise_wf_ma: wildfly_ma
 #имя службв wildfly для mar
 name_servise_mar: wildfly_mar
+#юзер под которым снимаем дамп
+user_posgres: postgres
+#имя базы cm6
+dbcm6: cm6
+#имя базы cmj
+dbcmj: cmj
+#имя базы ma
+dbma: ma
+#имя базы mar
+dbmar: mar
