@@ -28,33 +28,68 @@
   hosts: APP_MASTER
   user: root
   vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy: "{{cm}}"
   tasks:
     - name: wf stop
       service: name={{name_servise_wf_claster_mansger}} state=stopped
+      when: destroy
+
+    - name: wf igonor
+      debug:
+        msg:
+          - "Отсановка игнорируеться"
+      when: not destroy
 
 - name: Wildfly slave stop
   hosts: APP
   user: root
   vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy: "{{cm}}"
   tasks:
     - name: wf stop
       service: name={{name_servise_wf}} state=stopped
+
+    - name: wf igonor
+      debug:
+        msg:
+          - "Отсановка игнорируеться"
+      when: not destroy
 
 - name: ma stop
   hosts: MA
   user: root
   vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_ma: "{{ma}}"
   tasks:
     - name: ma stop
       service: name={{name_servise_wf_ma}} state=stopped
+      when: destroy_ma
+
+    - name: wf_ma igonor
+      debug:
+        msg:
+          - "Отсановка ma игнорируеться"
+      when: not destroy_ma
 
 - name: mar stop
   hosts: MAR
   user: root
   vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_mar: "{{cm}}"
   tasks:
     - name: mar stop
       service: name={{name_servise_mar}} state=stopped
+      when: destroy_mar
+
+    - name: wf_mar igonor
+      debug:
+        msg:
+          - "Отсановка mar игнорируеться"
+      when: not destroy_mar
 
 - name: start pg_dump cm6
   hosts: PG_CM5
