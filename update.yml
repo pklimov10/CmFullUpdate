@@ -7,6 +7,9 @@
     - name: "Ansible | Print multiple variable"
       debug:
           msg:
+            - "Обновление CM: {{cm}}"
+            - "Обновление MA: {{ma}}"
+            - "Обновление MAR: {{mar}}"
             - "имя службы на мастере wf: {{ name_servise_wf_claster_mansger }}"
             - "имя службы на пользовательск их WF: {{ name_servise_wf }}"
             - "имя службы wildfly для менджера агентов: {{ name_servise_wf_ma }}"
@@ -79,7 +82,7 @@
   user: root
   vars_files: ~/ansible/common/vars/global.yml
   vars:
-    destroy_mar: "{{cm}}"
+    destroy_mar: "{{mar}}"
   tasks:
     - name: mar stop
       service: name={{name_servise_mar}} state=stopped
@@ -92,24 +95,60 @@
       when: not destroy_mar
 
 - name: start pg_dump cm6
-  hosts: PG_CM5
+  hosts: APP_MASTER
   user: root
   vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy: "{{cm}}"
 
   tasks:
     - name: PG_DUMP_CM5
       become: yes
-      become_user: {{user_posgres}}
-      command: "pg_dump --port 5432 --username 'postgres' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs=48 --file '{{CM5_PG_DIR}}/CM5-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}' 'cm5'"
+      become_user: "{{user_posgres}}"
+      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username='{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ cm6_db_settings_default_NAME }}' --file '{{CM5_PG_DIR}}/CM5-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy
 
-- hosts: PG_CMJ
+    - name: PG_DUMP_CM5 igonor
+      debug:
+        msg:
+          - "Создание дампа для Cm6 игнорируется"
+      when: not destroy
+
+- hosts: BD_CMJ
   user: root
+  vars_files: ~/ansible/common/vars/global.yml
   vars:
-    CMJ_PG_DIR: /opt/cm-sochi/backup
+    destroy: "{{cm}}"
 
   tasks:
     - name: PG_DUMP_CMJ
       become: yes
-      become_user: {{user_posgres}}
-      command: "pg_dump --port 5432 --username 'postgres' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs=48 --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}' 'cmj'"
+      become_user: "{{user_posgres}}"
+      shell: "pg_dump --port={{ cmj_db_settings_default_PORT }} --username'{{ cmj_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cmj_db_settings_default_JOBS }}' --dbname='{{ cmj_db_settings_default_NAME }}' --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy
 
+    - name: PG_DUMP_CM5 igonor
+      debug:
+        msg:
+          - "Создание дампа для CMJ игнорируется"
+      when: not destroy
+
+- name: start pg_dump MA
+  hosts: BD_MA
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_mar: "{{ma}}"
+
+  tasks:
+    - name: PG_DUMP_MA
+      become: yes
+      become_user: "{{user_posgres}}"
+      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username'{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ cm6_db_settings_default_NAME }}' --file '{{CM5_PG_DIR}}/MA-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy_mar
+
+    - name: PG_DUMP_MA igonor
+      debug:
+        msg:
+          - "Создание дампа для MA игнорируется"
+      when: not destroy_mar
