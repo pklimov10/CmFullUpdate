@@ -19,6 +19,14 @@
             - "имя базы cmj: {{ dbcmj }}"
             - "имя базы ma: {{ dbma }}"
             - "имя базы mar: {{ dbmar }}"
+            - "порт базы для cm6 {{ cm6_db_settings_default_PORT }}"
+            - "логин от postgres cm6: {{ cm6_db_settings_default_USER }}"
+            - "кол-во потоков для cm6: {{ cm6_db_settings_default_JOBS }}"
+            - "куда снимаем дамп см6: {{ CM5_PG_DIR }}"
+            - "порт базы для cmj {{ cmj_db_settings_default_PORT }}"
+            - "логин от postgres cmj: {{ cmj_db_settings_default_USER }}"
+            - "кол-во потоков для cmj: {{ cmj_db_settings_default_JOBS }}"
+            - "куда снимаем дамп смj: {{ CMJ_PG_DIR }}"
 
 #tasks:
 #- fail: msg="The variable 'bar' is empty"
@@ -100,19 +108,21 @@
   vars_files: ~/ansible/common/vars/global.yml
   vars:
     destroy: "{{cm}}"
+    ignor_cm6: "{{ignor_cm6_dump}}"
+
 
   tasks:
     - name: PG_DUMP_CM5
       become: yes
       become_user: "{{user_posgres}}"
-      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username='{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ cm6_db_settings_default_NAME }}' --file '{{CM5_PG_DIR}}/CM5-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
-      when: destroy
+      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username='{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ dbcm6 }}' --file '{{CM5_PG_DIR}}/CM5-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy and not ignor_cm6
 
     - name: PG_DUMP_CM5 igonor
       debug:
         msg:
           - "Создание дампа для Cm6 игнорируется"
-      when: not destroy
+      when: not destroy and ignor_cm6
 
 - hosts: BD_CMJ
   user: root
@@ -124,7 +134,7 @@
     - name: PG_DUMP_CMJ
       become: yes
       become_user: "{{user_posgres}}"
-      shell: "pg_dump --port={{ cmj_db_settings_default_PORT }} --username'{{ cmj_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cmj_db_settings_default_JOBS }}' --dbname='{{ cmj_db_settings_default_NAME }}' --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      shell: "pg_dump --port={{ cmj_db_settings_default_PORT }} --username'{{ cmj_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cmj_db_settings_default_JOBS }}' --dbname='{{ dbcmj }}' --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
       when: destroy
 
     - name: PG_DUMP_CM5 igonor
@@ -144,11 +154,11 @@
     - name: PG_DUMP_MA
       become: yes
       become_user: "{{user_posgres}}"
-      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username'{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ cm6_db_settings_default_NAME }}' --file '{{CM5_PG_DIR}}/MA-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
-      when: destroy_mar
+      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username'{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ dbma }}' --file '{{CM5_PG_DIR}}/MA-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy_ma
 
     - name: PG_DUMP_MA igonor
       debug:
         msg:
           - "Создание дампа для MA игнорируется"
-      when: not destroy_mar
+      when: not destroy_ma

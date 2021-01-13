@@ -1,7 +1,7 @@
 ---
 #обновлять cm true - да false - нет
 #данный свод перменых нужен для того что бы избегать отключение серворв которых не существует
-#наличие еар скрипт опредляет автоматичиски
+#наличие еар скрипт опредляет автоматичиски дамп также будет игнорироваться при значении false
 cm: true
 ma: true
 mar: true
@@ -34,10 +34,10 @@ cm6_db_settings_default_PORT: 5432
 cm6_db_settings_default_USER: postgres
 #кол-во потоков для cm6
 cm6_db_settings_default_JOBS: 40
-#название базы cm6
-cm6_db_settings_default_NAME: cm6
 #куда снимаем дамп
 CM5_PG_DIR: /opt/
+#приндуительное игнорирование дампа
+ignor_cm6_dump: false
 ###======================================###
 ###======================================###
 ###------НАСТРОЙКА ДАМПА ДЛЯ CMJ---------###
@@ -49,8 +49,6 @@ cmj_db_settings_default_PORT: 5432
 cmj_db_settings_default_USER: postgres
 #кол-во потоков для cmj
 cmj_db_settings_default_JOBS: 40
-#название базы cmj
-cmj_db_settings_default_NAME: cm6
 #куда снимаем дамп cmj
 CMJ_PG_DIR: /opt/
 #
@@ -65,8 +63,6 @@ ma_db_settings_default_PORT: 5432
 ma_db_settings_default_USER: postgres
 #кол-во потоков для  МА
 ma_db_settings_default_JOBS: 40
-#название базы МА
-ma_db_settings_default_NAME: cm6
 #куда снимаем дамп МА
 ma_PG_DIR: /opt/
 #
@@ -81,8 +77,6 @@ mar_db_settings_default.PORT: 5432
 mar_db_settings_default.USER: postgres
 #кол-во потоков для МАR
 mar_db_settings_default.JOBS: 40
-#название базы МАR
-mar_db_settings_default.NAME: cm6
 #куда снимаем дамп МАR
 mar_PG_DIR: /opt/
 #
