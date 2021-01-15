@@ -10,6 +10,11 @@
             - "Обновление CM: {{cm}}"
             - "Обновление MA: {{ma}}"
             - "Обновление MAR: {{mar}}"
+            - "Перезагрузка АРтемиса: {{artemis}}"
+            - "Игнорирование дампа CM5/6: {{ignor_cm6_dump}}"
+            - "Игнорирование дампа CMJ: {{ignor_cmj_dump}}"
+            - "Игнорирование дампа MA: {{ignor_ma_dump}}"
+            - "Игнорирование дампа MAR: {{ignor_mar_dump}}"
             - "имя службы на мастере wf: {{ name_servise_wf_claster_mansger }}"
             - "имя службы на пользовательск их WF: {{ name_servise_wf }}"
             - "имя службы wildfly для менджера агентов: {{ name_servise_wf_ma }}"
@@ -102,6 +107,23 @@
           - "Отсановка mar игнорируеться"
       when: not destroy_mar
 
+- name: Artemis stop
+  hosts: AREMIS
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_Artemis: "{{artemis}}"
+  tasks:
+    - name: artemis stop
+      service: name={{artemis_servise}} state=stopped
+      when: destroy_Artemis
+
+    - name: wf_mar igonor
+      debug:
+        msg:
+          - "Отсановка Artemis игнорируеться"
+      when: not destroy_Artemis
+
 - name: start pg_dump cm6
   hosts: APP_MASTER
   user: root
@@ -122,26 +144,27 @@
       debug:
         msg:
           - "Создание дампа для Cm6 игнорируется"
-      when: not destroy and ignor_cm6
+      when: not destroy or ignor_cm6
 
 - hosts: BD_CMJ
   user: root
   vars_files: ~/ansible/common/vars/global.yml
   vars:
     destroy: "{{cm}}"
+    ignor_cmj: "{{ignor_cmj_dump}}"
 
   tasks:
     - name: PG_DUMP_CMJ
       become: yes
       become_user: "{{user_posgres}}"
       shell: "pg_dump --port={{ cmj_db_settings_default_PORT }} --username'{{ cmj_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cmj_db_settings_default_JOBS }}' --dbname='{{ dbcmj }}' --file '{{CMJ_PG_DIR}}/CMJ-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
-      when: destroy
+      when: destroy and not ignor_cmj
 
-    - name: PG_DUMP_CM5 igonor
+    - name: PG_DUMP_CMJ igonor
       debug:
         msg:
           - "Создание дампа для CMJ игнорируется"
-      when: not destroy
+      when: not destroy or ignor_cmj
 
 - name: start pg_dump MA
   hosts: BD_MA
@@ -149,16 +172,38 @@
   vars_files: ~/ansible/common/vars/global.yml
   vars:
     destroy_mar: "{{ma}}"
+    ignor_ma: "{{ignor_ma_dump}}"
 
   tasks:
     - name: PG_DUMP_MA
       become: yes
       become_user: "{{user_posgres}}"
-      shell: "pg_dump --port={{ cm6_db_settings_default_PORT }} --username'{{ cm6_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ cm6_db_settings_default_JOBS }}' --dbname='{{ dbma }}' --file '{{CM5_PG_DIR}}/MA-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
-      when: destroy_ma
+      shell: "pg_dump --port={{ ma_db_settings_default_PORT }} --username'{{ ma_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ ma_db_settings_default_JOBS }}' --dbname='{{ dbma }}' --file '{{CM5_PG_DIR}}/MA-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy_ma and not ignor_ma
 
     - name: PG_DUMP_MA igonor
       debug:
         msg:
           - "Создание дампа для MA игнорируется"
-      when: not destroy_ma
+      when: not destroy_ma or ignor_ma
+
+- name: start pg_dump MAR
+  hosts: BD_MAR
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_mar: "{{mar}}"
+    ignor_mar: "{{ignor_mar_dump}}"
+
+  tasks:
+    - name: PG_DUMP_MAR
+      become: yes
+      become_user: "{{user_posgres}}"
+      shell: "pg_dump --port={{ mar_db_settings_default_PORT }} --username'{{ mar_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ mar_db_settings_default_JOBS }}' --dbname='{{ dbmar }}' --file '{{CM5_PG_DIR}}/MAr-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
+      when: destroy_ma and not ignor_mar
+
+    - name: PG_DUMP_MA igonor
+      debug:
+        msg:
+          - "Создание дампа для MAR игнорируется"
+      when: not destroy_mar or ignor_mar
