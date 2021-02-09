@@ -200,7 +200,7 @@
       become: yes
       become_user: "{{user_posgres}}"
       shell: "pg_dump --port={{ mar_db_settings_default_PORT }} --username'{{ mar_db_settings_default_USER  }}' --role 'postgres' --format directory --blobs --no-privileges --no-tablespaces --verbose --no-unlogged-table-data --jobs='{{ mar_db_settings_default_JOBS }}' --dbname='{{ dbmar }}' --file '{{CM5_PG_DIR}}/MAr-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}'"
-      when: destroy_ma and not ignor_mar
+      when: destroy_mar and not ignor_mar
 
     - name: PG_DUMP_MA igonor
       debug:
