@@ -110,6 +110,23 @@
           - "Отсановка mar игнорируеться"
       when: not destroy_mar
 
+- name: CMI stop
+  hosts: CMI
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_cmi: "{{cmi}}"
+  tasks:
+    - name: mar stop
+      service: name={{name_servise_cmi}} state=stopped
+      when: destroy_cmi
+
+    - name: wf_cmi igonor
+      debug:
+        msg:
+          - "Отсановка cmi игнорируеться"
+      when: not destroy_cmi
+
 - name: Artemis stop
   hosts: AREMIS
   user: root

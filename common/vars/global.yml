@@ -6,6 +6,7 @@
 cm: true
 ma: true
 mar: false
+cmi: false
 #перезагрузка артима при обнолвении
 artemis: true
 #указваем от куда качаем еарнмик
@@ -30,6 +31,7 @@ name_servise_wf_ma: wildfly_ma
 name_servise_mar: wildfly_mar
 #имя службы артемис
 artemis_servise: artemis
+name_servise_cmi: wildfly
 ###======================================###
 ###======================================###
 ###-------------НАСТРОЙКА БД-------------###
