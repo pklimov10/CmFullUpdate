@@ -35,7 +35,6 @@
             - "от куда качаем ear: {{download_ear_home}}"
             - "куда качаем ear: {{WF_DIR_EAR}}"
             - "сервер с коротого заираем ярник и нга котором есть деректория из перменой download_ear_home {{delegate_IP_EAR}}"
-            - ::
 
 #tasks:
 #- fail: msg="The variable 'bar' is empty"
@@ -120,6 +119,23 @@
   tasks:
     - name: artemis stop
       service: name={{artemis_servise}} state=stopped
+      when: destroy_Artemis
+
+    - name: wf_mar igonor
+      debug:
+        msg:
+          - "Отсановка Artemis игнорируеться"
+      when: not destroy_Artemis
+
+- name: Artemis start
+  hosts: AREMIS
+  user: root
+  vars_files: ~/ansible/common/vars/global.yml
+  vars:
+    destroy_Artemis: "{{artemis}}"
+  tasks:
+    - name: artemis stop
+      service: name={{artemis_servise}} state=started
       when: destroy_Artemis
 
     - name: wf_mar igonor
